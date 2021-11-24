@@ -1,0 +1,21 @@
+{
+  "type": "mysql",
+  "host": "localhost",
+  "port": 3306,
+  "username": "root",
+  "password": "@Chihuy1103",
+  "database": "e-commerce",
+  "synchronize": true,
+  "logging": true,
+  "entities": [
+    "src/modules/**/*.entity{.ts,.js}"
+  ],
+  "migrations": [
+    "src/migration/*{.ts,.js}"
+  ],
+  "cli": {
+    "entitiesDir": "src/entity",
+    "migrationsDir": "src/migration",
+    "subscribersDir": "src/subscriber"
+  }
+}
