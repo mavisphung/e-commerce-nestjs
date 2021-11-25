@@ -99,7 +99,7 @@ export class UserService {
   }
 
   // GET USER BY EMAIL
-  private async findUserByEmail(email: string): Promise<User | undefined> {
+  public async findUserByEmail(email: string): Promise<User | undefined> {
     const found = await this.repo.createQueryBuilder("u")
                                 .where("u.email = :email", { email })
                                 .getOne();

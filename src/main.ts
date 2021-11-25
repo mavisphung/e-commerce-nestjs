@@ -18,6 +18,7 @@ async function bootstrap() {
   const apiOptions = new DocumentBuilder()
       .setTitle("E-commerce")
       .setDescription("This is a demo e-commercial app")
+      .addBearerAuth() //add jwt authentication
       .build();
 
   const document = SwaggerModule.createDocument(app, apiOptions);

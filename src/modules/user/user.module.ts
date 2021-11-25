@@ -13,6 +13,10 @@ import { ConfigService } from '@nestjs/config';
     UserService,
     ConfigService
   ],
-  controllers: [UserController]
+  controllers: [UserController],
+  exports: [
+    UserService,
+    TypeOrmModule
+  ]
 })
 export class UserModule {}

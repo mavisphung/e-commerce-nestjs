@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Res } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
+import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { Response } from 'express';
 import { UserDto, UserView, IUpdateUserView } from './user.dto';
@@ -9,7 +10,9 @@ import { User } from './user.entity';
 import { UpdateResult } from 'typeorm';
 
 
+@ApiBearerAuth()
 @Controller('user')
+@UseGuards(JwtAuthGuard) //must be authenticated /user/**
 export class UserController {
 
   constructor(private userService: UserService) {}

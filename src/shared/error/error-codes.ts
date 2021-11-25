@@ -64,6 +64,10 @@ const ErrorList = {
   [ERROR_CODE.USER_NOT_FOUND]: {
     statusCode: HttpStatus.NOT_FOUND,
     message: "Not found user",
+  },
+  [ERROR_CODE.UNAUTHORIZED]: {
+    statusCode: HttpStatus.UNAUTHORIZED,
+    message: "Invalid email or password"
   }
 };
 export { ErrorDetails, ERROR_CODE, ErrorList };
