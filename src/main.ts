@@ -1,15 +1,18 @@
+import { JwtAuthGuard } from './modules/auth/jwt-auth.guard';
 import "reflect-metadata";
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
+
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { ValidationPipe } from "@nestjs/common";
 import { AllExceptionsFilter } from "./shared/error";
+import { AuthGuard } from "./shared/auth/auth.guard";
+import { RoleGuard } from "./shared/auth/role-auth.guard";
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  dotenv.config();
   const configService: ConfigService = app.get(ConfigService);
   const host = configService.get("server.host", "localhost");
   const port = configService.get("server.port", 8080);
@@ -30,7 +33,15 @@ async function bootstrap() {
   //Exception filter
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(port);
+  const reflector = app.get(Reflector);
+  //setup global middlewares
+  app.useGlobalGuards(
+    // new JwtAuthGuard(),
+    new AuthGuard(reflector),
+    // new RoleGuard(),
+  );
+
+  await app.listen(port, host);
   console.log(`Application is running on ${await app.getUrl()}`);
 }
 bootstrap();

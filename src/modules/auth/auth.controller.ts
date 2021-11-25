@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginPayload } from './auth.dto';
+import { Public } from 'src/shared/public.decorator';
 
 
 @ApiTags("authenticate")
@@ -14,6 +15,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("/login")
+  @Public()
   async authenticate(
     @Body() credential: LoginPayload,
     @Res() res: Response

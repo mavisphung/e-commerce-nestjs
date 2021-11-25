@@ -13,14 +13,15 @@ import { JwtStrategy } from './jwt.strategy';
     PassportModule.register({
       defaultStrategy: "jwt"
     }),
+    // JwtModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const jwtOptions = {
-          secret: configService.get('JWT.SECRET', 'asdfasdf'),
-          signOptions: { expiresIn: configService.get('JWT.EXPIRES_IN') || '1d' },
+          secret: configService.get('JWT_SECRET', 'abc'),
+          signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') || '1d' },
         }
-        console.log("Jwt Config: ", jwtOptions);
+        // console.log("Jwt Config: ", jwtOptions);
         return jwtOptions;
       },
       inject: [ConfigService],

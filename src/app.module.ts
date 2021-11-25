@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import * as dotenv from 'dotenv';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import config from './common/index';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
+import { RoleModule } from './modules/role/role.module';
+
+dotenv.config();
 
 @Module({
   imports: [
@@ -36,6 +39,22 @@ import { PassportModule } from '@nestjs/passport';
     }),
     UserModule,
     AuthModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const jwtOptions = {
+          secret: configService.get('JWT_SECRET', 'abc'),
+          signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') || '1d' },
+        }
+        // console.log("Jwt Config: ", jwtOptions);
+        return jwtOptions;
+      },
+      inject: [ConfigService],
+    }),
+    RoleModule,
   ],
+  exports:[
+    JwtModule
+  ]
 })
 export class AppModule {}

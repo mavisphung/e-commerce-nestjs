@@ -1,4 +1,5 @@
-import { Column, Entity, Exclusion, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, Exclusion, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Role } from "../role/role.entity";
 import { UserStatus } from "./user.enum";
 
 @Entity({
@@ -50,6 +51,14 @@ export class User {
     default: UserStatus.INACTIVE
   })
   status: UserStatus;
+
+  @ManyToOne(
+    () => Role,
+    role => role.id,
+    { cascade: true, onDelete: "CASCADE", onUpdate: "RESTRICT" }
+  )
+  @JoinColumn({ name: "role_id"})
+  role: Role;
 
   getFullName() {
     return this.firstName + " " + this.lastName;

@@ -1,9 +1,12 @@
 import defaultConfig from "./default.json";
 import merge from "lodash";
 
-// const envConfig = process.env;
+const envConfig = process.env;
 // // console.log(envConfig);
-const mergeConfig = merge(defaultConfig);
+const mergeConfig = merge({
+  defaultConfig,
+  envConfig
+});
 // // console.log(mergeConfig);
 export default (): any => mergeConfig;
 // export default defaultConfig;

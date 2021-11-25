@@ -1,18 +1,19 @@
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { UserDto, UserView, IUpdateUserView } from './user.dto';
 import { UserStatus } from './user.enum';
 import { IListRes, ISingleRes } from 'src/shared/response';
 import { User } from './user.entity';
 import { UpdateResult } from 'typeorm';
+import { Public } from 'src/shared/public.decorator';
 
 
 @ApiBearerAuth()
 @Controller('user')
-@UseGuards(JwtAuthGuard) //must be authenticated /user/**
+// @UseGuards(JwtAuthGuard) //must be authenticated /user/**
 export class UserController {
 
   constructor(private userService: UserService) {}
@@ -25,8 +26,13 @@ export class UserController {
     status: HttpStatus.OK,
     description: "Get all users from database"
   })
+  @Public()
   @Get("/admin")
-  async getAllUsers(@Res() res: Response) {
+  async getAllUsers(
+    @Req() req: Request, 
+    @Res() res: Response
+  ) {
+    // console.log("UserController: req.user = ", req.user);
     const data = await this.userService.findAll();
     if (!data || !data[0]) return res.status(404).send({message: "No data"});
 
@@ -47,6 +53,7 @@ export class UserController {
     return res.status(HttpStatus.OK).send(listRes);
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiTags("admin-users")
   @ApiOperation({ summary: "Create a user" })
   @ApiResponse({
@@ -74,6 +81,7 @@ export class UserController {
     return res.status(201).send(result);
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiTags("admin-users")
   @ApiOperation({ summary: "Retrieve a specific user" })
   @ApiResponse({
@@ -90,6 +98,7 @@ export class UserController {
     return singleRes;
   }
 
+  @UseGuards(JwtAuthGuard)
   @ApiTags("admin-users")
   @Patch("/admin/:id")
   async updateUserById(
