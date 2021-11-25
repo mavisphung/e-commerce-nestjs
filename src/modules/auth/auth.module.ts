@@ -10,25 +10,27 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    PassportModule,
-    // JwtModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => {
-    //     const jwtOptions = {
-    //       secret: configService.get('JWT.SECRET', 'asdfasdf'),
-    //       signOptions: { expiresIn: configService.get('JWT.EXPIRES_IN') || '1d' },
-    //     }
-    //     console.log("Jwt Config: ", jwtOptions);
-    //     return jwtOptions;
-    //   },
-    //   inject: [ConfigService],
-    // }),
-    JwtModule.register({
-      secret: "do#may@biet*do",
-      signOptions: {
-        expiresIn: "1d"
-      }
+    PassportModule.register({
+      defaultStrategy: "jwt"
     }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const jwtOptions = {
+          secret: configService.get('JWT.SECRET', 'asdfasdf'),
+          signOptions: { expiresIn: configService.get('JWT.EXPIRES_IN') || '1d' },
+        }
+        console.log("Jwt Config: ", jwtOptions);
+        return jwtOptions;
+      },
+      inject: [ConfigService],
+    }),
+    // JwtModule.register({
+    //   secret: "do#may@biet*do",
+    //   signOptions: {
+    //     expiresIn: "1d"
+    //   }
+    // }),
     UserModule,
   ],
   providers: [
