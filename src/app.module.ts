@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
+import { AuthModule } from './modules/auth/auth.module';
 import config from './common/index';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -31,7 +34,8 @@ import config from './common/index';
         return options;
       }
     }),
-    UserModule
+    UserModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

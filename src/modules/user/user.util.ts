@@ -1,4 +1,7 @@
+import { UnauthorizedException } from "@nestjs/common";
 import bcrypt from "bcrypt";
+import { UserView } from "./user.dto";
+import { User } from "./user.entity";
 
 
 export class UserUtil {
@@ -9,5 +12,25 @@ export class UserUtil {
         return resolve(hashed);
       })
     })
+  }
+
+  static async validatePassword(plain: string, hashed: string): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(plain, hashed, (err, same) => {
+        if (err) return new UnauthorizedException();
+
+        return resolve(same);
+      }); 
+    });
+  }
+
+  static getUserViewByUser(user: User): UserView {
+    return {
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      status: user.status
+    } as UserView;
   }
 }
