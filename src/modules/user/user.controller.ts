@@ -1,3 +1,4 @@
+import { Length } from 'class-validator';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -5,10 +6,12 @@ import { UserService } from './user.service';
 import { Request, Response } from 'express';
 import { UserDto, UserView, IUpdateUserView } from './user.dto';
 import { UserStatus } from './user.enum';
-import { IListRes, ISingleRes } from 'src/shared/response';
+import { IListModels, IListRes, ISingleRes } from 'src/shared/response';
 import { User } from './user.entity';
 import { UpdateResult } from 'typeorm';
 import { Public } from 'src/shared/public.decorator';
+import { RoleCode } from '../role/role.enum';
+import { AllowedRole } from 'src/shared/role.decorator';
 
 
 @ApiBearerAuth()
@@ -26,7 +29,9 @@ export class UserController {
     status: HttpStatus.OK,
     description: "Get all users from database"
   })
-  @Public()
+  // @Public()
+  @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   @Get("/admin")
   async getAllUsers(
     @Req() req: Request, 
@@ -36,16 +41,22 @@ export class UserController {
     const data = await this.userService.findAll();
     if (!data || !data[0]) return res.status(404).send({message: "No data"});
 
+    // console.log("Last element in user list: ", data[data.length - 1]);
     const listRes: IListRes<UserView> = {
       success: true,
       data: data.map(user => {
-        //return user detail except password
+        //return user detail except password,
         const view: UserView = {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber,
           status: user.status,
+          role: user.role !== null ? {
+            id: user.role.id,
+            name: user.role.name,
+            code: user.role.code,
+          } : null
         }
         return view;
       })
@@ -54,6 +65,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   @ApiTags("admin-users")
   @ApiOperation({ summary: "Create a user" })
   @ApiResponse({
@@ -71,6 +83,11 @@ export class UserController {
       status: saved.status,
       phoneNumber: saved.phoneNumber,
       password: saved.password,
+      role: {
+        id: saved.role.id,
+        name: saved.role.name,
+        code: saved.role.code,
+      }
     }
 
     const result: ISingleRes<UserView> = {
@@ -82,6 +99,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   @ApiTags("admin-users")
   @ApiOperation({ summary: "Retrieve a specific user" })
   @ApiResponse({
@@ -99,6 +117,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   @ApiTags("admin-users")
   @Patch("/admin/:id")
   async updateUserById(

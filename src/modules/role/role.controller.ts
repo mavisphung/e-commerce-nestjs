@@ -1,12 +1,14 @@
+import { JwtAuthGuard } from './../auth/jwt-auth.guard';
 import { ISingleRes, IListRes } from './../../shared/response/index';
-import { Body, Controller, Get, HttpStatus, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/shared/public.decorator';
 import { RoleDto } from './role.dto';
 import { Role } from './role.entity';
 import { RoleService } from './role.service';
 import { Response } from 'express';
-
+import { AllowedRole } from 'src/shared/role.decorator';
+import { RoleCode } from './role.enum';
 @ApiTags("roles")
 @Controller('roles')
 export class RoleController {
@@ -16,8 +18,8 @@ export class RoleController {
   ) {}
 
   @Post()
-  // @Public()
-  
+  @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   async process(
     @Body() role: RoleDto,
     @Res() res: Response
@@ -31,8 +33,9 @@ export class RoleController {
     return res.status(HttpStatus.OK).send(response);
   }
 
-  @Public()
   @Get()
+  @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
   async getRoles(
     @Res() res: Response
   ) {

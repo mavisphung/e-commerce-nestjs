@@ -6,10 +6,18 @@ export interface JwtPayload {
   readonly userId: number;
   //extend more...
   readonly userInfo: UserView;
+  // readonly role: IRole
+}
+
+export interface IRole {
+  readonly id: number;
+  readonly code: string;
+  readonly name: string;
+  readonly description?: string;
 }
 
 export class LoginPayload {
-  @ApiProperty({ example: "thisismygmail@gmail.com" })
+  @ApiProperty({ example: "admin@gmail.com" })
   @IsEmail()
   email!: string;
 

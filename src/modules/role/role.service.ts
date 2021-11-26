@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RoleDto } from './role.dto';
+import { IRole, RoleDto } from './role.dto';
 import { Role } from './role.entity';
 
 @Injectable()
@@ -24,5 +24,11 @@ export class RoleService {
 
   find(): Promise<Role[]> {
     return this.repo.find();
+  }
+
+  getRoleByCode(code: string): Promise<Role | undefined> {
+    return this.repo.createQueryBuilder("r")
+                    .where("r.code = :code", { code })
+                    .getOne();
   }
 }

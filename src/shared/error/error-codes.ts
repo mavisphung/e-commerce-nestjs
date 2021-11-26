@@ -68,6 +68,10 @@ const ErrorList = {
   [ERROR_CODE.UNAUTHORIZED]: {
     statusCode: HttpStatus.UNAUTHORIZED,
     message: "Invalid email or password"
+  },
+  [ERROR_CODE.ROLE_NOT_FOUND]: {
+    statusCode: HttpStatus.NOT_FOUND,
+    message: "Role not found"
   }
 };
 export { ErrorDetails, ERROR_CODE, ErrorList };

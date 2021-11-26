@@ -1,5 +1,5 @@
 import { ERROR_CODE } from 'src/shared/error';
-import { CanActivate, ExecutionContext } from "@nestjs/common";
+import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { JwtModuleOptions, JwtService } from "@nestjs/jwt";
 import { AppError } from "../error";
 import { Reflector } from '@nestjs/core';
@@ -7,7 +7,7 @@ import { Reflector } from '@nestjs/core';
 
 
 
-
+@Injectable()
 export class AuthGuard implements CanActivate {
 
   private jwtService: JwtService;
@@ -23,13 +23,19 @@ export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     console.log("AuthGuard.canActivate(content) invoked");
 
-    // determine which route is public
-    const isPublic = this.reflector.get<boolean>("isPublic", context.getHandler());
+    //----------------------GET ROLES----------------------
+    // determine who is allowed to continue, base on role code
+    // get role codes from decorator of controller method
+    const allowedRoles = this.reflector.get<string[]>("roleCodes", context.getHandler());
+    console.log("RoleCodes: ", allowedRoles);
 
-    if(isPublic) {
-      console.log("Log in so that bypass AuthGuard middleware");
+    // nothing means public
+    if (!allowedRoles || !allowedRoles.length) {
+      console.log("Not authorized yet");
       return true;
     }
+    
+
     const request = context.switchToHttp().getRequest();
 
     //if there is no authorization in header, refuse the request
@@ -40,9 +46,22 @@ export class AuthGuard implements CanActivate {
     const decodedToken = this.jwtService.decode(token) as {
       [key: string]: any
     };
-    // console.log("decoded here", decodedToken);
+    console.log("decoded here", decodedToken);
+
+    const roleInToken = decodedToken.userInfo.role;
+    console.log("Get role in token: ", roleInToken);
+    const isMatched = allowedRoles.includes(roleInToken.code);
 
     request.user = decodedToken;
-    return true;
+
+    return isMatched;
   }
+
+  // Use for many role
+  private matchRoles(allowedRoles: string[], rolesInToken: string[]): boolean {
+    const matches = allowedRoles.filter(role => rolesInToken.includes(role));
+    return matches.length > 0;
+  }
+
+
 }

@@ -30,7 +30,12 @@ export class UserUtil {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      status: user.status
+      status: user.status,
+      role: {
+        id: user.role.id,
+        code: user.role.code,
+        name: user.role.name,
+      }
     } as UserView;
   }
 }

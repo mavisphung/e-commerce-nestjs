@@ -1,3 +1,4 @@
+import { RoleCode } from './../role/role.enum';
 import { ConfigService } from '@nestjs/config';
 import { UserStatus } from './user.enum';
 import { Injectable } from '@nestjs/common';
@@ -7,20 +8,39 @@ import { Repository, UpdateResult } from 'typeorm';
 import { UserDto, UserView, IUpdateUserView } from './user.dto';
 import { User } from './user.entity';
 import { UserUtil } from './user.util';
+import { Role } from '../role/role.entity';
+import { RoleService } from '../role/role.service';
+import { IListModels } from 'src/shared/response';
 
 @Injectable()
 export class UserService {
 
   constructor(
     @InjectRepository(User) private readonly repo: Repository<User>,
-    readonly configService: ConfigService  
+    private readonly roleService: RoleService,
+    private readonly configService: ConfigService
   ) {
 
   }
 
   // GET ALL USERS
   public async findAll(): Promise<User[]> {
-    return this.repo.find();
+    const response = await this.repo.createQueryBuilder("user")
+                               .leftJoinAndSelect("user.role", "role")
+                               .getMany();
+
+    // const ids = response.map(user => user.id);
+    // const arr = this.roleService.getAll(ids);
+    // find(arr, x => {
+
+    // })
+    // response.map(user => {
+    //   user.role.id = ids[]
+    // })                 
+
+    // can not use repo.find() because the find() only loads all users without role
+    // const response = await this.repo.find();
+    return response;
   }
 
 
@@ -30,6 +50,13 @@ export class UserService {
     const isExisted = await this.isExistedUser(dto.email);
     if (isExisted) throw new AppError(ERROR_CODE.USER_EXISTED, "Duplicated email");
     
+    //find role in database
+    const role = await this.roleService.getRoleByCode(dto.role);
+
+    if (!role) {
+      throw new AppError(ERROR_CODE.ROLE_NOT_FOUND);
+    }
+
     const saltRounds = this.configService.get<string | number>("BCRYPT.SALT");
     const hashedPassword = await UserUtil.hash(dto.password, saltRounds);
     
@@ -41,6 +68,7 @@ export class UserService {
       UserStatus.ACTIVE,
       dto.phoneNumber
     );
+    user.role = role;
 
     return this.repo.save(user);
   }
@@ -101,6 +129,7 @@ export class UserService {
   // GET USER BY EMAIL
   public async findUserByEmail(email: string): Promise<User | undefined> {
     const found = await this.repo.createQueryBuilder("u")
+                                .leftJoinAndSelect("u.role", "role") //load user with role
                                 .where("u.email = :email", { email })
                                 .getOne();
     return found;

@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import config from './common/index';
 import { JwtModule } from '@nestjs/jwt';
 import { RoleModule } from './modules/role/role.module';
+import { ProductModule } from './modules/product/product.module';
+import { SupplierModule } from './modules/supplier/supplier.module';
 
 dotenv.config();
 
@@ -52,6 +54,8 @@ dotenv.config();
       inject: [ConfigService],
     }),
     RoleModule,
+    ProductModule,
+    SupplierModule,
   ],
   exports:[
     JwtModule

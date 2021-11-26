@@ -1,6 +1,9 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { Role } from './../role/role.entity';
+import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, Length, Max } from "class-validator";
 import { UserStatus } from "./user.enum";
+import { RoleCode } from '../role/role.enum';
+import { IRole, IRoleDto } from '../role/role.dto';
 
 export class UserDto {
 
@@ -25,6 +28,13 @@ export class UserDto {
   @ApiProperty({ example: "Phung" })
   @IsNotEmpty()
   lastName: string;
+
+  @ApiProperty({
+    required: true,
+    example: `${RoleCode.SUPPLIER}`
+  })
+  // @ApiHideProperty()
+  role: RoleCode;
 }
 
 export interface UserView {
@@ -34,6 +44,7 @@ export interface UserView {
   readonly lastName: string,
   readonly status: UserStatus,
   readonly password?: string,
+  readonly role: IRole
 }
 
 export interface IUpdateUserView {

@@ -30,3 +30,14 @@ export class RoleDto {
 export class RolesInput {
   readonly roles: Role[];
 }
+
+export interface IRole {
+  readonly id: number;
+  readonly name: string;
+  readonly code: string;
+  readonly description?: string;
+}
+
+export interface IRoleDto {
+  readonly role: RoleCode;
+}
