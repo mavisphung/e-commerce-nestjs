@@ -1,6 +1,6 @@
 import { Length } from 'class-validator';
 import { JwtAuthGuard } from './../auth/jwt-auth.guard';
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { Request, Response } from 'express';
@@ -8,7 +8,7 @@ import { UserDto, UserView, IUpdateUserView } from './user.dto';
 import { UserStatus } from './user.enum';
 import { IListModels, IListRes, ISingleRes } from 'src/shared/response';
 import { User } from './user.entity';
-import { UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 import { Public } from 'src/shared/public.decorator';
 import { RoleCode } from '../role/role.enum';
 import { AllowedRole } from 'src/shared/role.decorator';
@@ -119,6 +119,9 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @AllowedRole(RoleCode.ADMIN)
   @ApiTags("admin-users")
+  @ApiOperation({
+    summary: "Update a specific user by id"
+  })
   @Patch("/admin/:id")
   async updateUserById(
     @Param("id") id: number,
@@ -134,5 +137,28 @@ export class UserController {
       data: result
     }
     return singleRes;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @AllowedRole(RoleCode.ADMIN)
+  @ApiTags("admin-users")
+  @ApiOperation({
+    summary: "Delete user by id"
+  })
+  @Delete("/admin/:id")
+  async deleteUserById(
+    @Param("id") id: number,
+    @Res() res: Response
+  ) {
+    const result = await this.userService.removeUserById(id);
+    const resData: ISingleRes<DeleteResult> = {
+      success: true,
+      data: result,
+      metadata: {
+        message: "Deleted user " + id + " in database"
+      }
+    }
+
+    return res.status(HttpStatus.OK).send(resData);
   }
 }

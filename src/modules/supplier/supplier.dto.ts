@@ -1,7 +1,7 @@
 import { RoleCode } from './../role/role.enum';
 import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { IsDefined, IsEmail, IsNotEmpty, Length } from "class-validator";
-import { UserDto } from '../user/user.dto';
+import { UserDto, UserView } from '../user/user.dto';
 
 export class SupplierDto extends UserDto {
 
@@ -31,4 +31,8 @@ export class SupplierDto extends UserDto {
   @IsNotEmpty()
   address: string;
   
+}
+
+export interface SupplierView extends UserView {
+  readonly supplierId: string;
 }

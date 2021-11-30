@@ -6,6 +6,9 @@ import { UserService } from '../user/user.service';
 import { AppError, ERROR_CODE } from 'src/shared/error';
 import { UserUtil } from '../user/user.util';
 import { UserView } from '../user/user.dto';
+import { Supplier } from '../supplier/supplier.entity';
+import { RoleCode } from '../role/role.enum';
+import { SupplierView } from '../supplier/supplier.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,11 +43,15 @@ export class AuthService {
     if (!userData) {
       throw new UnauthorizedException();
     }
-    const view: UserView = UserUtil.getUserViewByUser(userData);
+    let view;
+    if (userData.role.code === RoleCode.SUPPLIER) {
+      view = UserUtil.getUserViewByUser(userData) as UserView;
+    }
+    
     
     const payload: JwtPayload = {
       userId: userData.id,
-      userInfo: view
+      userInfo: view,
     }
     
     const token = this.jwtService.sign(payload);

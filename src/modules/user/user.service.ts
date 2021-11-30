@@ -134,4 +134,12 @@ export class UserService {
                                 .getOne();
     return found;
   }
+
+  // REMOVE USER FROM DB
+  public async removeUserById(id: number) {
+    return this.repo.createQueryBuilder("")
+                    .where("id = :id", { id })
+                    .delete()
+                    .execute();
+  }
 }

@@ -1,5 +1,7 @@
+import { Supplier } from './../supplier/supplier.entity';
 import { UnauthorizedException } from "@nestjs/common";
 import bcrypt from "bcrypt";
+import { SupplierView } from "../supplier/supplier.dto";
 import { UserView } from "./user.dto";
 import { User } from "./user.entity";
 
@@ -35,7 +37,7 @@ export class UserUtil {
         id: user.role.id,
         code: user.role.code,
         name: user.role.name,
-      }
+      },
     } as UserView;
   }
 }

@@ -44,7 +44,7 @@ export interface UserView {
   readonly lastName: string,
   readonly status: UserStatus,
   readonly password?: string,
-  readonly role: IRole
+  readonly role: IRole,
 }
 
 export interface IUpdateUserView {
@@ -61,4 +61,9 @@ export class UpdateUserModel {
     readonly lastName: string,
     readonly phoneNumber: string,
   ) {}
+}
+
+export interface ICurrentUser {
+  readonly userId: number;
+  readonly userInfo: UserView;
 }

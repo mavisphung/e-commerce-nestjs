@@ -1,6 +1,6 @@
 import { Supplier } from './supplier.entity';
 import { User } from './../user/user.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from '../user/user.service';
 import { Repository } from 'typeorm';
@@ -47,5 +47,42 @@ export class SupplierService {
 
   private generateSupplierId(input: string): string {
     return createHash("md5").update(input).digest("hex");
+  }
+
+  public async getSuppliers(): Promise<Supplier[]> {
+    return this.repo.createQueryBuilder("s")
+                    .leftJoinAndSelect("s.role", "role")
+                    .getMany();
+  }
+
+  public async getSupplierById(id: number): Promise<Supplier> {
+    return this.repo.createQueryBuilder("s")
+                    .leftJoinAndSelect("s.role", "role")
+                    .where("s.id = :id", { id: id })
+                    // .andWhere("s.role = :role", { role: RoleCode.SUPPLIER })
+                    .getOne();
+  }
+
+  public async getSupplierBySupplierId(supplierId: string): Promise<Supplier> {
+    return this.repo.createQueryBuilder("s")
+                    .leftJoinAndSelect("s.role", "role")
+                    .where("s.supplier_id = :supplier_id", { supplier_id: supplierId })
+                    // .andWhere("s.role = :role", { role: RoleCode.SUPPLIER })
+                    .getOne();
+  }
+
+  public async getExternalId(email: string) {
+
+    const supplier = await this.repo.createQueryBuilder("s")
+                          .where("s.email = :email", { email })
+                          .getOne();
+    return supplier ? supplier.supplierId : undefined;
+  }
+
+  public async getSupplierByEmail(email: string) {
+
+    return this.repo.createQueryBuilder("s")
+                      .where("s.email = :email", { email })
+                      .getOne();
   }
 }
